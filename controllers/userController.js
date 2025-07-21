@@ -2,6 +2,8 @@ import User from "../model/User.js";
 import jwt from "jsonwebtoken";
 import "dotenv/config"
 
+// const isProduction = process.env.NODE_ENV === "production";
+
 export const userRegister = async (req, res) => {
   try {
     const { email, password, name } = req.body;
@@ -18,16 +20,9 @@ export const userRegister = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "24h" },
       (err, token) => {
-        if (err) return res.status(500).json({ message: "Token generation error" });
+         if(err) throw err
 
-        res.cookie("token", token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-          maxAge: 24 * 60 * 60 * 1000 
-        });
-
-        res.status(200).json({
+        res.status(201).json({
           user: {
             id: user._id,
             name: user.name,
@@ -59,23 +54,16 @@ export const userLogin = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
       (err, token) => {
-        if (err) return res.status(500).json({ message: "Token generation error" });
+         if(err) throw err
 
-        res.cookie("token", token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-          maxAge: 24 * 60 * 60 * 1000 
-        });
-
-        res.status(200).json({
-          user: {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-          },
-          token,
-        });
+            res.status(200).json({
+                user:{
+                    id:user._id,
+                    name:user.name,
+                    email:user.email,
+                    role:user.role
+                },token
+            })
       }
     );
   } catch (error) {
@@ -83,16 +71,17 @@ export const userLogin = async (req, res) => {
   }
 };
 
-export const logoutUser = async (req,res)=>{
- try {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-    });
-    res.status(200).json({ message: "logout Sucessfully" });
- } catch (error) {
-    res.status(500).json({ message: "server error" });
- }
-}
+// export const logoutUser = async (req,res)=>{
+//  try {
+//     res.clearCookie("token", {
+//       httpOnly: true,
+//       secure: isProduction,
+//       sameSite: isProduction ? "none" : "lax",
+//       path: "/",
+//       maxAge: 24 * 60 * 60 * 1000, 
+//     });
+//     res.status(200).json({ message: "logout Sucessfully" });
+//  } catch (error) {
+//     res.status(500).json({ message: "server error" });
+//  }
+// }

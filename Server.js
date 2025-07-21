@@ -13,7 +13,7 @@ import searchRoute from "./Routes/searchRoute.js"
 const app = express()
 const Port = process.env.PORT || 9000
 
-//middleWares
+
 app.use(express.json())
 app.use(cors(
   {
